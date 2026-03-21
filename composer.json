@@ -1,0 +1,133 @@
+{
+	"name": "laravel/laravel",
+	"type": "project",
+	"description": "The skeleton application for the Laravel framework.",
+	"keywords": [
+		"laravel",
+		"framework"
+	],
+	"license": "MIT",
+	"require": {
+		"php": "^8.2",
+		"ext-bcmath": "*",
+		"ext-iconv": "*",
+		"ahmmmmad11/filters": "^0.4.4",
+		"ashallendesign/short-url": "^8.2",
+		"flowframe/laravel-trend": "^0.4.0",
+		"hashids/hashids": "^5.0",
+		"inertiajs/inertia-laravel": "^2.0",
+		"intervention/validation": "^4.6",
+		"kreait/firebase-php": "^7.19",
+		"laravel/framework": "^12.0",
+		"laravel/horizon": "^5.27",
+		"laravel/jetstream": "^5.0",
+		"laravel/nightwatch": "^1.21",
+		"laravel/octane": "^2.9",
+		"laravel/prompts": "^0.3.6",
+		"laravel/reverb": "@beta",
+		"laravel/sanctum": "^4.0",
+		"laravel/scout": "^10.13",
+		"laravel/telescope": "^5.2",
+		"laravel/tinker": "^2.9",
+		"league/flysystem-aws-s3-v3": "^3.0",
+		"maatwebsite/excel": "^3.1",
+		"netflie/whatsapp-cloud-api": "^2.2",
+		"owen-it/laravel-auditing": "^14.0",
+		"pion/laravel-chunk-upload": "^1.5",
+		"posthog/posthog-php": "^3.7",
+		"predis/predis": "~2.0",
+		"rap2hpoutre/fast-excel": "^5.5",
+		"silviolleite/laravelpwa": "^2.0",
+		"spatie/laravel-medialibrary": "^11.4",
+		"staudenmeir/laravel-adjacency-list": "^1.22",
+		"stevebauman/location": "^7.3",
+		"tightenco/ziggy": "^2.0",
+		"typesense/typesense-php": "^5.0",
+        "ext-intl": "*"
+    },
+	"require-dev": {
+		"barryvdh/laravel-debugbar": "^3.14",
+		"fakerphp/faker": "^1.23",
+		"larastan/larastan": "^3.0",
+		"laravel/pint": "^1.18",
+		"laravel/sail": "^1.26",
+		"mockery/mockery": "^1.6",
+		"nunomaduro/collision": "^8.0",
+		"pestphp/pest": "^3.0",
+		"pestphp/pest-plugin-laravel": "^3.0",
+		"phpstan/phpstan": "^2.1",
+		"phpunit/php-code-coverage": "^11.0",
+		"phpunit/phpunit": "^11.3",
+		"psalm/plugin-laravel": "^3.0",
+		"rector/rector": "^2.3",
+		"rector/rector-laravel": "^2.1",
+		"spatie/laravel-ignition": "^2.4"
+	},
+	"autoload": {
+		"psr-4": {
+			"App\\": "app/",
+			"Database\\Factories\\": "database/factories/",
+			"Database\\Seeders\\": "database/seeders/"
+		},
+		"files": [
+			"app/Helpers/helper.php"
+		]
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\": "tests/"
+		}
+	},
+	"scripts": {
+		"post-autoload-dump": [
+			"Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+			"@php artisan package:discover --ansi"
+		],
+		"post-update-cmd": [
+			"@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+		],
+		"post-root-package-install": [
+			"@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+		],
+		"post-create-project-cmd": [
+			"@php artisan key:generate --ansi",
+			"@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+			"@php artisan migrate --graceful --ansi"
+		],
+        "bump:minor": [
+            "composer update && composer bump",
+            "npx npm-check-updates -u -t minor && npm install"
+        ],
+        "lint": "pint --parallel",
+        "refactor": "rector",
+        "test:lint": "pint --test --parallel",
+        "test:refactor": "rector --dry-run",
+        "test:types": "phpstan analyse",
+        "test:arch": "pest --filter=arch",
+        "test:type-coverage": "pest --type-coverage --min=100",
+        "test:unit": "pest --parallel --coverage --exactly=99.5",
+        "test": [
+            "@test:lint",
+            "@test:refactor",
+            "@test:types",
+            "@test:type-coverage",
+            "@test:unit"
+        ]
+	},
+	"extra": {
+		"laravel": {
+			"dont-discover": []
+		}
+	},
+	"config": {
+		"optimize-autoloader": true,
+		"preferred-install": "dist",
+		"sort-packages": true,
+		"allow-plugins": {
+			"pestphp/pest-plugin": true,
+			"php-http/discovery": true
+		}
+	},
+	"minimum-stability": "stable",
+	"prefer-stable": true
+}

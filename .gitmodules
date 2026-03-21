@@ -1,0 +1,3 @@
+[submodule "eslint-plugin-translation"]
+	path = eslint-plugin-translation
+	url = https://github.com/ahmmmmad11/eslint-plugin-translation

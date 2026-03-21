@@ -1,0 +1,62 @@
+services:
+    highbase-app:
+        build:
+            context: './docker/franken'
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+
+        container_name: laravel-frankenphp
+        restart: unless-stopped
+        ports:
+          - 8000:8000
+          - 443:443
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
+            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
+            IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            SUPERVISOR_PHP_COMMAND: "/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan octane:start --server=frankenphp --host=0.0.0.0 --workers=5 --max-requests=100 --admin-port=2019 --port='${APP_PORT:-80}'"
+            XDG_CONFIG_HOME: /var/www/html/config
+            XDG_DATA_HOME: /var/www/html/data
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+#    nginx:
+#        image: nginx:alpine
+#        ports:
+#          - '80:80'
+#        volumes:
+#          - './docker/nginx/default.conf:/etc/nginx/conf.d/default.conf'
+#          - '.:/var/www/html'
+#        depends_on:
+#          - highbase-app
+#        networks:
+#          - sail
+
+    redis:
+      image: 'redis:alpine'
+      container_name: laravel-redis
+      restart: unless-stopped
+      ports:
+        # Expose Redis on 6370 externally, but it's still 6379 internally
+        - '${FORWARD_REDIS_PORT:-6370}:6379'
+      networks:
+        - sail
+      healthcheck:
+        test: [ "CMD", "redis-cli", "ping" ]
+        retries: 3
+        timeout: 5s
+      volumes:
+        - redis-data:/data
+      command: redis-server --appendonly yes
+
+
+volumes:
+  redis-data:
+    driver: local
+networks:
+    sail:
+        driver: bridge
