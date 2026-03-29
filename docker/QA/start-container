@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+if [ "$SUPERVISOR_PHP_USER" != "root" ] && [ "$SUPERVISOR_PHP_USER" != "sail" ]; then
+    echo "You should set SUPERVISOR_PHP_USER to either 'sail' or 'root'."
+    exit 1
+fi
+
+if [ ! -z "$WWWUSER" ]; then
+    usermod -u $WWWUSER sail
+fi
+
+if [ ! -d /.composer ]; then
+    mkdir /.composer
+fi
+
+chmod -R ugo+rw /.composer
+
+if [ ! -d "/var/www/html/vendor" ]; then
+    echo "Vendor folder not found. Running composer install..."
+    composer install --no-dev --prefer-dist --no-interaction
+else
+    echo "Vendor folder already exists. Skipping composer install."
+fi
+
+if [ ! -d "/var/www/html/node_modules" ]; then
+    echo "node_modules folder not found. Running npm install..."
+    npm install
+    npm run build
+else
+    echo "node_modules folder already exists. Skipping npm install."
+fi
+
+php /var/www/html/artisan octane:install --server=frankenphp
+
+# Install supervisor if not already installed
+if ! command -v supervisord &> /dev/null; then
+    echo "Installing supervisor..."
+    apt-get update && apt-get install -y supervisor
+fi
+
+# Create necessary directories for supervisor
+mkdir -p /var/log/supervisor /var/run
+
+if [ $# -gt 0 ]; then
+    if [ "$SUPERVISOR_PHP_USER" = "root" ]; then
+        exec "$@"
+    else
+        exec gosu $WWWUSER "$@"
+    fi
+
+else
+    exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi
